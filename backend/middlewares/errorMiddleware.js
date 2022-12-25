@@ -1,7 +1,7 @@
-module.exports = (err, req, res, next) => {
+const errorMiddleware = async (err, req, res, next) => {
   let statusCode = null;
 
-  console.log(err);
+  console.log("ERROR!!!", err);
 
   if (res.statusCode) {
     statusCode = res.statusCode;
@@ -12,3 +12,5 @@ module.exports = (err, req, res, next) => {
   res.status(statusCode).json({ message: err.message, stack: err.stack });
   next();
 };
+
+module.exports = errorMiddleware;

@@ -1,5 +1,4 @@
 // http://localhost:62000/api/v1/films
-const { response } = require("express");
 const Film = require("../models/FilmModel.js");
 
 class FilmsController {
@@ -7,9 +6,11 @@ class FilmsController {
     const { title, year, rate } = req.body;
 
     if (!title || !year || !rate) {
-      res.status(400);
-      throw new Error("Pease, provide all fields!");
+      const error = new Error("Please, provide all fields");
+      error.status = 400;
+      throw error;
     }
+
     const film = await Film.create({ ...req.body });
     if (!film) {
       res.status(400);
