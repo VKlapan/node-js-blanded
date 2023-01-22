@@ -5,12 +5,20 @@ const path = require("path");
 const connectDb = require("../config/db.js");
 
 const express = require("express");
+const { engine } = require("express-handlebars");
 
 const notFound = require("./middlewares/notFound.js");
 const errorMiddleware = require("./middlewares/errorMiddleware.js");
 const authMiddleware = require("./middlewares/authMiddleware");
 
 const app = express();
+
+app.use(express.static("public"));
+
+//set templates engine
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
+app.set("views", "backend/views");
 
 // setup app to read JSON and forms
 app.use(express.json());
@@ -21,6 +29,38 @@ const CONFIG_PATH = path.join(__dirname, "..", "config", ".env");
 //load config
 dotenv.config({ path: CONFIG_PATH });
 //set routes
+
+app.get("/", (req, res) => {
+  res.render("home");
+});
+
+app.get("/contact", (req, res) => {
+  res.render("contact");
+});
+
+app.get("/about", (req, res) => {
+  res.render("about");
+});
+
+// app.post("/send", (req, res) => {
+//   //res.send(req.body);
+//   const { userName, userEmail } = req.body;
+
+//   res.render("send", { msg: "Thanks!", userName, userEmail });
+// });
+
+const sendEmail = require("./services/sendEmail");
+
+app.post("/send", async (req, res) => {
+  const { userName, userEmail } = req.body;
+
+  try {
+    await sendEmail(req.body);
+    res.render("send", { msg: "Thanks!", userName, userEmail });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 app.use("/api/v1/films", require("./routes/filmsRoutes.js"));
 
